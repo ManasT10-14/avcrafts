@@ -12,9 +12,12 @@ const ProductDetail = () => {
     const [productPrices, setProductPrices] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // UI States
+    // Determine if this is a Fridge Magnet (ID 1) or Magnetic Frame (ID 2)
+    const isFridgeMagnet = id === '1';
+
+    // UI States - set defaults based on product type
     const [selectedShape, setSelectedShape] = useState('circle');
-    const [selectedSize, setSelectedSize] = useState('2x3');
+    const [selectedSize, setSelectedSize] = useState(isFridgeMagnet ? '2x3' : 'mini');
     const [selectedColor, setSelectedColor] = useState('natural');
     const [quantity, setQuantity] = useState(1);
     const [imageFile, setImageFile] = useState(null);
@@ -24,9 +27,6 @@ const ProductDetail = () => {
     // Modal state
     const [showPreview, setShowPreview] = useState(false);
 
-    // Determine if this is a Fridge Magnet (ID 1)
-    const isFridgeMagnet = id === '1';
-
     // Calculate current price based on selection
     const getCurrentPrice = () => {
         if (productPrices.length === 0) {
@@ -34,15 +34,30 @@ const ProductDetail = () => {
         }
 
         if (isFridgeMagnet) {
+            // For circle shape, size is always 23mm
             const sizeToMatch = selectedShape === 'circle' ? '23mm' : selectedSize;
             const priceEntry = productPrices.find(p => p.shape === selectedShape && p.size === sizeToMatch);
             return parseFloat(priceEntry?.price) || parseFloat(product?.price) || 0;
         } else {
-            // Magnetic frames - no shape, just size
+            // Magnetic frames - no shape, just size (mini or wall)
             const priceEntry = productPrices.find(p => p.size === selectedSize);
             return parseFloat(priceEntry?.price) || parseFloat(product?.price) || 0;
         }
     };
+
+    // Reset size when shape changes for Fridge Magnets
+    useEffect(() => {
+        if (isFridgeMagnet && selectedShape === 'rectangle') {
+            setSelectedSize('2x3');
+        }
+    }, [selectedShape, isFridgeMagnet]);
+
+    // Set correct default size when product loads
+    useEffect(() => {
+        if (!isFridgeMagnet) {
+            setSelectedSize('mini');
+        }
+    }, [id, isFridgeMagnet]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
