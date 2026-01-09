@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut, Clock, CheckCircle, Palette, Truck, PackageCheck, XCircle } from 'lucide-react';
+import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut, Clock, CheckCircle, Palette, Truck, PackageCheck, XCircle, RotateCw } from 'lucide-react';
 import api from '../utils/api';
 
 const AdminOrders = () => {
@@ -263,7 +263,20 @@ const AdminOrders = () => {
                                 {selectedOrder.image_data && (
                                     <div>
                                         <h4 className="text-sm font-medium text-earth-900 mb-2">Customer Uploaded Image</h4>
-                                        <img src={selectedOrder.image_data} alt="Customer upload" className="max-w-full max-h-48 rounded-lg border border-earth-200" />
+                                        <div className="inline-block p-2 border border-earth-200 rounded-lg bg-white overflow-hidden">
+                                            <img
+                                                src={selectedOrder.image_data}
+                                                alt="Customer upload"
+                                                className="max-w-full max-h-64 rounded transition-transform duration-300 origin-center"
+                                                style={{ transform: `rotate(${selectedOrder.image_rotation || 0}deg)` }}
+                                            />
+                                        </div>
+                                        {selectedOrder.image_rotation > 0 && (
+                                            <p className="text-xs text-earth-500 mt-1">
+                                                <RotateCw size={12} className="inline mr-1" />
+                                                Rotated {selectedOrder.image_rotation}°
+                                            </p>
+                                        )}
                                     </div>
                                 )}
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Truck, ShieldCheck, Upload, Minus, Plus, Check, ImageIcon, X, Eye } from 'lucide-react';
+import { ArrowLeft, Clock, Truck, ShieldCheck, Upload, Minus, Plus, Check, ImageIcon, X, Eye, RotateCw } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import api from '../utils/api';
 
@@ -22,10 +22,14 @@ const ProductDetail = () => {
     const [quantity, setQuantity] = useState(1);
     const [imageFile, setImageFile] = useState(null);
     const [imageData, setImageData] = useState('');
+    const [imageRotation, setImageRotation] = useState(0); // 0, 90, 180, 270 degrees
     const [addedToCart, setAddedToCart] = useState(false);
 
     // Modal state
     const [showPreview, setShowPreview] = useState(false);
+
+    // Check if rotation is allowed (not for circle magnets)
+    const canRotate = !(isFridgeMagnet && selectedShape === 'circle');
 
     // Calculate current price based on selection
     const getCurrentPrice = () => {
@@ -149,7 +153,8 @@ const ProductDetail = () => {
             size: getDisplaySize(),
             color: isFridgeMagnet ? null : selectedColor,
             quantity: quantity,
-            imageData: imageData
+            imageData: imageData,
+            imageRotation: canRotate ? imageRotation : 0
         });
 
         setAddedToCart(true);
@@ -251,8 +256,11 @@ const ProductDetail = () => {
                             <img
                                 src={imageData}
                                 alt="Your uploaded image"
-                                className="w-full h-full object-contain"
-                                style={{ borderRadius: dimensions.isCircle ? '50%' : '6px' }}
+                                className={`w-full h-full object-contain transition-transform duration-300`}
+                                style={{
+                                    borderRadius: dimensions.isCircle ? '50%' : '6px',
+                                    transform: `rotate(${imageRotation}deg)`
+                                }}
                             />
                         ) : (
                             <div className="flex flex-col items-center justify-center text-earth-400 p-4">
@@ -365,7 +373,8 @@ const ProductDetail = () => {
                                 <img
                                     src={imageData}
                                     alt="Your uploaded image"
-                                    className="w-full h-full object-contain bg-white"
+                                    className="w-full h-full object-contain bg-white transition-transform duration-300"
+                                    style={{ transform: `rotate(${imageRotation}deg)` }}
                                 />
                             ) : (
                                 <div className="flex flex-col items-center justify-center text-earth-400 p-4 bg-earth-50 w-full h-full">
@@ -617,15 +626,28 @@ const ProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Preview Button - Only show when image is uploaded */}
+                        {/* Preview and Rotate Buttons - Only show when image is uploaded */}
                         {imageData && (
-                            <button
-                                onClick={() => setShowPreview(true)}
-                                className="w-full py-3 bg-earth-100 text-earth-700 rounded-full font-medium uppercase tracking-wide hover:bg-earth-200 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <Eye size={18} />
-                                Preview Your Design
-                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowPreview(true)}
+                                    className="flex-1 py-3 bg-earth-100 text-earth-700 rounded-full font-medium uppercase tracking-wide hover:bg-earth-200 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Eye size={18} />
+                                    Preview
+                                </button>
+                                {canRotate && (
+                                    <button
+                                        onClick={() => setImageRotation((prev) => (prev + 90) % 360)}
+                                        className="py-3 px-5 bg-terracotta-100 text-terracotta-700 rounded-full font-medium uppercase tracking-wide hover:bg-terracotta-200 transition-colors flex items-center justify-center gap-2"
+                                        title="Rotate image 90°"
+                                    >
+                                        <RotateCw size={18} />
+                                        <span className="hidden sm:inline">Rotate</span>
+                                        <span className="text-xs">({imageRotation}°)</span>
+                                    </button>
+                                )}
+                            </div>
                         )}
 
                         {/* Actions */}
