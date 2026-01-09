@@ -9,8 +9,10 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(cors({
   origin: [
+    "http://localhost:5173",
     "http://localhost:5174",
-    "https://avcrafts.vercel.app" // later
+    "https://avcrafts.vercel.app",
+    /\.vercel\.app$/  // Allow all Vercel preview deployments
   ],
   credentials: true
 }));
@@ -29,10 +31,10 @@ app.use('/api', authRoutes);
 app.use('/api', addressRoutes);
 
 app.get('/', (req, res) => {
-    res.send('AVCrafts API is running');
+  res.send('AVCrafts API is running');
 });
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
