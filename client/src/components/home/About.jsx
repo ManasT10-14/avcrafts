@@ -26,7 +26,7 @@ const About = () => {
                     </div>
 
                     <p className="text-body text-lg">
-                        At MemoriLb, we believe that every picture tells a story worth preserving. Founded in 2024, our studio was born from a simple desire: to create beautiful, handcrafted homes for your most cherished moments.
+                        At AV Crafts, we believe that every picture tells a story worth preserving. Founded in 2024, our studio was born from a simple desire: to create beautiful, handcrafted homes for your most cherished moments.
                     </p>
 
                     <p className="text-body text-base">

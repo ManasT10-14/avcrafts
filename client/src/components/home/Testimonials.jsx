@@ -6,7 +6,7 @@ const Testimonials = () => {
         {
             name: "Sarah Jenkins",
             role: "Interior Designer",
-            text: "MemoriLb transformed my living room wall into a masterpiece. The quality of the frames is simply unmatched, and the attention to detail is evident in every corner.",
+            text: "AV Crafts transformed my living room wall into a masterpiece. The quality of the frames is simply unmatched, and the attention to detail is evident in every corner.",
             image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop"
         },
         {
