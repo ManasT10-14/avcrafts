@@ -264,12 +264,19 @@ const AdminOrders = () => {
                                     <div>
                                         <h4 className="text-sm font-medium text-earth-900 mb-2">Customer Design</h4>
                                         <div className="inline-block p-4 border border-earth-200 rounded-lg bg-earth-50 relative">
-                                            <div className="overflow-hidden bg-white shadow-sm rounded border border-earth-100 flex items-center justify-center p-2" style={{ width: 'fit-content' }}>
+                                            <div
+                                                className="overflow-hidden bg-white shadow-sm border border-earth-100 flex items-center justify-center p-2 transition-all"
+                                                style={{
+                                                    width: 'fit-content',
+                                                    borderRadius: selectedOrder.shape === 'circle' ? '50%' : '4px'
+                                                }}
+                                            >
                                                 <img
                                                     src={selectedOrder.image_data}
                                                     alt="Customer upload"
-                                                    className="max-w-full max-h-64 rounded origin-center"
+                                                    className="max-w-full max-h-64 origin-center object-cover"
                                                     style={{
+                                                        borderRadius: selectedOrder.shape === 'circle' ? '50%' : '4px',
                                                         transform: `rotate(${selectedOrder.customization_details?.rotation || selectedOrder.image_rotation || 0}deg) scale(${selectedOrder.customization_details?.scale || 1})`
                                                     }}
                                                 />
@@ -283,7 +290,11 @@ const AdminOrders = () => {
                                         </div>
 
                                         <div className="mt-2 flex flex-wrap gap-2 text-xs text-earth-600">
-                                            {/* Fix: Use Boolean cast or comparison to avoid rendering '0' */}
+                                            {selectedOrder.shape && (
+                                                <span className="px-2 py-1 bg-earth-100 rounded flex items-center gap-1 uppercase font-bold">
+                                                    {selectedOrder.shape}
+                                                </span>
+                                            )}
                                             {((selectedOrder.customization_details?.rotation || selectedOrder.image_rotation || 0) !== 0) && (
                                                 <span className="px-2 py-1 bg-earth-100 rounded flex items-center gap-1">
                                                     <RotateCw size={10} /> Img Rotation: {selectedOrder.customization_details?.rotation || selectedOrder.image_rotation}°

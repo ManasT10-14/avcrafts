@@ -5,6 +5,99 @@ import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, CheckCircle, Truck, CreditCard, MapPin, Plus, Check } from 'lucide-react';
 import api from '../utils/api';
 
+// Address Form Component extracted to prevent re-rendering issues
+const AddressForm = ({ formData, handleChange, errors }) => (
+    <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label className="block text-sm font-medium text-earth-700 mb-1">Full Name *</label>
+                <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.name ? 'border-red-500' : 'border-earth-200'}`}
+                    placeholder="John Doe"
+                />
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-earth-700 mb-1">Phone Number *</label>
+                <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.phone ? 'border-red-500' : 'border-earth-200'}`}
+                    placeholder="9876543210"
+                />
+                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+            </div>
+        </div>
+        <div>
+            <label className="block text-sm font-medium text-earth-700 mb-1">Email</label>
+            <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-earth-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500"
+                placeholder="john@example.com"
+            />
+        </div>
+        <div>
+            <label className="block text-sm font-medium text-earth-700 mb-1">Address *</label>
+            <textarea
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                rows={2}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.address ? 'border-red-500' : 'border-earth-200'}`}
+                placeholder="House/Flat No., Street, Landmark..."
+            />
+            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label className="block text-sm font-medium text-earth-700 mb-1">City *</label>
+                <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.city ? 'border-red-500' : 'border-earth-200'}`}
+                    placeholder="Mumbai"
+                />
+                {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-earth-700 mb-1">State *</label>
+                <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.state ? 'border-red-500' : 'border-earth-200'}`}
+                    placeholder="Maharashtra"
+                />
+                {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-earth-700 mb-1">Pincode *</label>
+                <input
+                    type="text"
+                    name="pincode"
+                    value={formData.pincode}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.pincode ? 'border-red-500' : 'border-earth-200'}`}
+                    placeholder="400001"
+                />
+                {errors.pincode && <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>}
+            </div>
+        </div>
+    </div>
+);
+
 const Checkout = () => {
     const { cartItems, getCartTotal, clearCart } = useCart();
     const { user, isLoggedIn } = useAuth();
@@ -126,7 +219,9 @@ const Checkout = () => {
                     ...orderAddress,
                     paymentMethod: formData.paymentMethod,
                     imageData: item.imageData || '',
-                    customizationNote: `${item.name} - Shape: ${item.shape || 'N/A'}, Size: ${item.size || 'N/A'}, Color: ${item.color || 'N/A'}`
+                    customizationNote: `${item.name} - Shape: ${item.shape || 'N/A'}, Size: ${item.size || 'N/A'}, Color: ${item.color || 'N/A'}`,
+                    imageRotation: item.imageRotation,
+                    customizationDetails: item.customizationDetails
                 };
 
                 const res = await fetch(api.createOrder(), {
@@ -189,99 +284,6 @@ const Checkout = () => {
         navigate('/cart');
         return null;
     }
-
-    // Address Form Component
-    const AddressForm = () => (
-        <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-earth-700 mb-1">Full Name *</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.name ? 'border-red-500' : 'border-earth-200'}`}
-                        placeholder="John Doe"
-                    />
-                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-earth-700 mb-1">Phone Number *</label>
-                    <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.phone ? 'border-red-500' : 'border-earth-200'}`}
-                        placeholder="9876543210"
-                    />
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                </div>
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-earth-700 mb-1">Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-earth-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500"
-                    placeholder="john@example.com"
-                />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-earth-700 mb-1">Address *</label>
-                <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    rows={2}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.address ? 'border-red-500' : 'border-earth-200'}`}
-                    placeholder="House/Flat No., Street, Landmark..."
-                />
-                {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-earth-700 mb-1">City *</label>
-                    <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.city ? 'border-red-500' : 'border-earth-200'}`}
-                        placeholder="Mumbai"
-                    />
-                    {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-earth-700 mb-1">State *</label>
-                    <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.state ? 'border-red-500' : 'border-earth-200'}`}
-                        placeholder="Maharashtra"
-                    />
-                    {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-earth-700 mb-1">Pincode *</label>
-                    <input
-                        type="text"
-                        name="pincode"
-                        value={formData.pincode}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${errors.pincode ? 'border-red-500' : 'border-earth-200'}`}
-                        placeholder="400001"
-                    />
-                    {errors.pincode && <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>}
-                </div>
-            </div>
-        </div>
-    );
 
     return (
         <div className="pt-28 pb-20 min-h-screen bg-earth-50">
@@ -364,13 +366,13 @@ const Checkout = () => {
                                                     ← Back to saved addresses
                                                 </button>
                                             )}
-                                            <AddressForm />
+                                            <AddressForm formData={formData} handleChange={handleChange} errors={errors} />
                                         </div>
                                     )}
                                 </div>
                             ) : (
                                 // Guest user: Show form
-                                <AddressForm />
+                                <AddressForm formData={formData} handleChange={handleChange} errors={errors} />
                             )}
                         </div>
 
