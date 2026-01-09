@@ -10,6 +10,7 @@ export const api = {
     // Product endpoints
     getProducts: (categoryId) => `${API_URL}/api/products/${categoryId}`,
     getProductDetail: (id) => `${API_URL}/api/product/detail/${id}`,
+    getProductPrices: (id) => `${API_URL}/api/product/${id}/prices`,
 
     // Order endpoints
     createOrder: () => `${API_URL}/api/orders`,

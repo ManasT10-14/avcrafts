@@ -9,6 +9,7 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
+    const [productPrices, setProductPrices] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // UI States
@@ -26,8 +27,27 @@ const ProductDetail = () => {
     // Determine if this is a Fridge Magnet (ID 1)
     const isFridgeMagnet = id === '1';
 
+    // Calculate current price based on selection
+    const getCurrentPrice = () => {
+        if (productPrices.length === 0) {
+            return parseFloat(product?.price) || 0;
+        }
+
+        if (isFridgeMagnet) {
+            const sizeToMatch = selectedShape === 'circle' ? '23mm' : selectedSize;
+            const priceEntry = productPrices.find(p => p.shape === selectedShape && p.size === sizeToMatch);
+            return parseFloat(priceEntry?.price) || parseFloat(product?.price) || 0;
+        } else {
+            // Magnetic frames - no shape, just size
+            const priceEntry = productPrices.find(p => p.size === selectedSize);
+            return parseFloat(priceEntry?.price) || parseFloat(product?.price) || 0;
+        }
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
+
+        // Fetch product details
         fetch(api.getProductDetail(id))
             .then(res => res.json())
             .then(data => {
@@ -38,6 +58,16 @@ const ProductDetail = () => {
                 console.error(err);
                 setLoading(false);
             });
+
+        // Fetch product prices
+        fetch(api.getProductPrices(id))
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setProductPrices(data);
+                }
+            })
+            .catch(err => console.error('Error fetching prices:', err));
     }, [id]);
 
     // Close modal on Escape key
@@ -93,10 +123,12 @@ const ProductDetail = () => {
             return;
         }
 
+        const currentPrice = getCurrentPrice();
+
         addToCart({
             productId: parseInt(id),
             name: product.name,
-            price: product.price,
+            price: currentPrice,
             image: product.image_url,
             shape: isFridgeMagnet ? selectedShape : null,
             size: getDisplaySize(),
@@ -439,8 +471,8 @@ const ProductDetail = () => {
                             <span className="text-xs font-semibold text-earth-400 tracking-[0.2em] uppercase block mb-3">AVCrafts Handcrafted</span>
                             <h1 className="text-4xl lg:text-5xl font-serif font-medium text-earth-900 mb-4 leading-tight">{product.name}</h1>
                             <div className="flex items-baseline gap-2 mb-2">
-                                <span className="text-2xl font-medium text-earth-900">₹{(parseFloat(product.price) || 0) * quantity}</span>
-                                {quantity > 1 && <span className="text-sm text-earth-500">(₹{parseFloat(product.price) || 0} each)</span>}
+                                <span className="text-2xl font-medium text-earth-900">₹{getCurrentPrice() * quantity}</span>
+                                {quantity > 1 && <span className="text-sm text-earth-500">(₹{getCurrentPrice()} each)</span>}
                             </div>
                             <p className="text-xs text-earth-500">Shipping calculated at checkout.</p>
                         </div>
