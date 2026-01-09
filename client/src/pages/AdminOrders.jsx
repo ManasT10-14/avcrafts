@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut } from 'lucide-react';
+import api from '../utils/api';
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -23,7 +24,7 @@ const AdminOrders = () => {
     }, []);
 
     const fetchOrders = () => {
-        fetch('http://localhost:5000/api/admin/orders')
+        fetch(api.getAdminOrders())
             .then(res => res.json())
             .then(data => {
                 setOrders(data);
@@ -37,7 +38,7 @@ const AdminOrders = () => {
 
     const updateStatus = async (orderId, newStatus) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/orders/${orderId}/status`, {
+            const res = await fetch(api.updateOrderStatus(orderId), {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })

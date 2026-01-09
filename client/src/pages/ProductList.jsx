@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ProductCard from '../components/common/ProductCard';
 import { Clock } from 'lucide-react';
+import api from '../utils/api';
 
 const ProductList = () => {
     const { categoryId } = useParams();
@@ -13,7 +14,7 @@ const ProductList = () => {
         // In a real app, fetch category name too. For now hardcode or infer.
         if (categoryId === '1') setCategoryName('Fridge Magnets');
 
-        fetch(`http://localhost:5000/api/products/${categoryId}`)
+        fetch(api.getProducts(categoryId))
             .then(res => res.json())
             .then(data => {
                 setProducts(data);

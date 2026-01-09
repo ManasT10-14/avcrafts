@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, MapPin, Plus, Edit2, Trash2, Check, X, User, Phone, LogOut } from 'lucide-react';
+import api from '../utils/api';
 
 const Profile = () => {
     const { user, isLoggedIn, logout, updateProfile } = useAuth();
@@ -36,7 +37,7 @@ const Profile = () => {
 
     const fetchAddresses = async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/addresses/${user.id}`);
+            const res = await fetch(api.getAddresses(user.id));
             const data = await res.json();
             setAddresses(data);
         } catch (err) {
@@ -62,8 +63,8 @@ const Profile = () => {
 
         try {
             const url = editingId
-                ? `http://localhost:5000/api/addresses/${editingId}`
-                : 'http://localhost:5000/api/addresses';
+                ? api.updateAddress(editingId)
+                : api.createAddress();
 
             const method = editingId ? 'PUT' : 'POST';
 
@@ -104,7 +105,7 @@ const Profile = () => {
         if (!window.confirm('Are you sure you want to delete this address?')) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/addresses/${id}`, {
+            const res = await fetch(api.deleteAddress(id), {
                 method: 'DELETE'
             });
             if (res.ok) {
@@ -117,7 +118,7 @@ const Profile = () => {
 
     const handleSetDefault = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/addresses/${id}/default`, {
+            const res = await fetch(api.setDefaultAddress(id), {
                 method: 'PUT'
             });
             if (res.ok) {

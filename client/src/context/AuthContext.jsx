@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import api from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -30,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     // Google login handler
     const loginWithGoogle = async (googleResponse) => {
         try {
-            const response = await fetch('http://localhost:5000/api/auth/google', {
+            const response = await fetch(api.googleAuth(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }) => {
         if (!user) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/auth/user/${user.id}`, {
+            const response = await fetch(api.updateUser(user.id), {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updates)

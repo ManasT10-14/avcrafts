@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Truck, ShieldCheck, Upload, Minus, Plus, Check, ImageIcon, X, Eye } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import api from '../utils/api';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -27,7 +28,7 @@ const ProductDetail = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        fetch(`http://localhost:5000/api/product/detail/${id}`)
+        fetch(api.getProductDetail(id))
             .then(res => res.json())
             .then(data => {
                 setProduct(data);

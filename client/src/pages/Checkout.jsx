@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, CheckCircle, Truck, CreditCard, MapPin, Plus, Check } from 'lucide-react';
+import api from '../utils/api';
 
 const Checkout = () => {
     const { cartItems, getCartTotal, clearCart } = useCart();
@@ -33,7 +34,7 @@ const Checkout = () => {
     useEffect(() => {
         if (isLoggedIn && user) {
             setLoadingAddresses(true);
-            fetch(`http://localhost:5000/api/addresses/${user.id}`)
+            fetch(api.getAddresses(user.id))
                 .then(res => res.json())
                 .then(data => {
                     setAddresses(data);
@@ -128,7 +129,7 @@ const Checkout = () => {
                     customizationNote: `${item.name} - Shape: ${item.shape || 'N/A'}, Size: ${item.size || 'N/A'}, Color: ${item.color || 'N/A'}`
                 };
 
-                const res = await fetch('http://localhost:5000/api/orders', {
+                const res = await fetch(api.createOrder(), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderData)
@@ -314,8 +315,8 @@ const Checkout = () => {
                                                 <label
                                                     key={addr.id}
                                                     className={`flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-colors ${selectedAddressId === addr.id
-                                                            ? 'border-terracotta-500 bg-terracotta-50'
-                                                            : 'border-earth-200 hover:border-earth-300'
+                                                        ? 'border-terracotta-500 bg-terracotta-50'
+                                                        : 'border-earth-200 hover:border-earth-300'
                                                         }`}
                                                 >
                                                     <input
