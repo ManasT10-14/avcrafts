@@ -283,7 +283,8 @@ const AdminOrders = () => {
                                         </div>
 
                                         <div className="mt-2 flex flex-wrap gap-2 text-xs text-earth-600">
-                                            {(selectedOrder.customization_details?.rotation || selectedOrder.image_rotation) && (
+                                            {/* Fix: Use Boolean cast or comparison to avoid rendering '0' */}
+                                            {((selectedOrder.customization_details?.rotation || selectedOrder.image_rotation || 0) !== 0) && (
                                                 <span className="px-2 py-1 bg-earth-100 rounded flex items-center gap-1">
                                                     <RotateCw size={10} /> Img Rotation: {selectedOrder.customization_details?.rotation || selectedOrder.image_rotation}°
                                                 </span>
