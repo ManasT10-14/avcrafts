@@ -439,8 +439,8 @@ const ProductDetail = () => {
                             <span className="text-xs font-semibold text-earth-400 tracking-[0.2em] uppercase block mb-3">AVCrafts Handcrafted</span>
                             <h1 className="text-4xl lg:text-5xl font-serif font-medium text-earth-900 mb-4 leading-tight">{product.name}</h1>
                             <div className="flex items-baseline gap-2 mb-2">
-                                <span className="text-2xl font-medium text-earth-900">₹{product.price * quantity}</span>
-                                {quantity > 1 && <span className="text-sm text-earth-500">(₹{product.price} each)</span>}
+                                <span className="text-2xl font-medium text-earth-900">₹{(product.price || 0) * quantity}</span>
+                                {quantity > 1 && <span className="text-sm text-earth-500">(₹{product.price || 0} each)</span>}
                             </div>
                             <p className="text-xs text-earth-500">Shipping calculated at checkout.</p>
                         </div>
