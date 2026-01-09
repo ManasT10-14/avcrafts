@@ -18,7 +18,7 @@ const Hero = () => {
             {/* Content */}
             <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 lg:px-16 text-center pt-20">
                 <span className="inline-block py-1 px-3 border border-white/60 rounded-full text-white text-xs tracking-widest uppercase mb-6 backdrop-blur-sm">
-                    Est. 2024
+                    Est. 2026
                 </span>
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight drop-shadow-sm">
                     Framing Life's <br />
