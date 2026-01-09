@@ -19,6 +19,7 @@ export const api = {
     // Admin endpoints
     getAdminOrders: () => `${API_URL}/api/admin/orders`,
     updateOrderStatus: (orderId) => `${API_URL}/api/admin/orders/${orderId}/status`,
+    deleteAllOrders: () => `${API_URL}/api/admin/orders`,
 
     // Auth endpoints
     googleAuth: () => `${API_URL}/api/auth/google`,

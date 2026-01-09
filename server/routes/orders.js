@@ -101,4 +101,22 @@ router.patch('/admin/orders/:orderId/status', async (req, res) => {
     }
 });
 
+// ADMIN: Delete ALL orders (Password protected)
+router.delete('/admin/orders', async (req, res) => {
+    const { password } = req.body;
+    const ADMIN_PASSWORD = 'avcrafts2024'; // Ideally in ENV, matches frontend
+
+    if (password !== ADMIN_PASSWORD) {
+        return res.status(403).json({ error: 'Invalid password' });
+    }
+
+    try {
+        await pool.query('DELETE FROM orders');
+        res.json({ message: 'All orders deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 module.exports = router;

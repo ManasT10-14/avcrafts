@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut, Clock, CheckCircle, Palette, Truck, PackageCheck, XCircle, RotateCw, ZoomIn, Layout } from 'lucide-react';
+import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut, Clock, CheckCircle, Palette, Truck, PackageCheck, XCircle, RotateCw, ZoomIn, Layout, Trash2 } from 'lucide-react';
 import api from '../utils/api';
 
 const AdminOrders = () => {
@@ -73,6 +73,33 @@ const AdminOrders = () => {
             }
         } catch (err) {
             console.error('Error updating status:', err);
+        }
+    };
+
+    const handleDeleteAllOrders = async () => {
+        const password = window.prompt("Enter Admin Password to Delete ALL Orders:");
+        if (!password) return;
+
+        if (!window.confirm("ARE YOU SURE? This will permanently delete all orders and cannot be undone.")) return;
+
+        try {
+            const res = await fetch(api.deleteAllOrders(), {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert('All orders have been deleted.');
+                fetchOrders(); // Refresh list
+            } else {
+                alert(`Failed: ${data.error || 'Unknown error'}`);
+            }
+        } catch (err) {
+            console.error('Error deleting orders:', err);
+            alert('Error deleting orders. See console.');
         }
     };
 
@@ -217,6 +244,18 @@ const AdminOrders = () => {
                         )}
                     </>
                 )}
+
+                {/* DELETE ALL BUTTON */}
+                <div className="mt-12 pt-8 border-t border-earth-200 flex justify-end opacity-75 hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={handleDeleteAllOrders}
+                        className="flex items-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors border border-red-100"
+                        title="DANGER: Permanently delete all orders"
+                    >
+                        <Trash2 size={16} />
+                        Delete All Orders
+                    </button>
+                </div>
                 {/* Order Detail Modal */}
                 {selectedOrder && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedOrder(null)}>
