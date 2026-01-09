@@ -8,7 +8,7 @@ router.post('/orders', async (req, res) => {
         productId, quantity, shape, size, color,
         totalAmount, customizationNote,
         customerName, email, phone, address, city, state, pincode,
-        paymentMethod, imageData, imageRotation
+        paymentMethod, imageData, imageRotation, customizationDetails
     } = req.body;
 
     if (!totalAmount) {
@@ -32,13 +32,13 @@ router.post('/orders', async (req, res) => {
                 user_id, product_id, quantity, shape, size, color,
                 total_amount, customization_note,
                 customer_name, email, phone, address, city, state, pincode,
-                payment_method, image_data, image_rotation
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
+                payment_method, image_data, image_rotation, customization_details
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING *`,
             [
                 userIdToUse, productId, quantity || 1, shape || '', size || '', color || '',
                 totalAmount, customizationNote || '',
                 customerName || '', email || '', phone || '', address || '', city || '', state || '', pincode || '',
-                paymentMethod || 'cod', imageData || '', imageRotation || 0
+                paymentMethod || 'cod', imageData || '', imageRotation || 0, customizationDetails || {}
             ]
         );
         res.status(201).json(result.rows[0]);

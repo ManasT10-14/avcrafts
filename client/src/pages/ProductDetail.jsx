@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Truck, ShieldCheck, Upload, Minus, Plus, Check, ImageIcon, X, Eye, RotateCw } from 'lucide-react';
+import { ArrowLeft, Clock, Truck, ShieldCheck, Upload, Minus, Plus, Check, ImageIcon, X, Eye, RotateCw, ZoomIn, ZoomOut, RefreshCw, Smartphone, Layout } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import api from '../utils/api';
 
@@ -22,7 +22,9 @@ const ProductDetail = () => {
     const [quantity, setQuantity] = useState(1);
     const [imageFile, setImageFile] = useState(null);
     const [imageData, setImageData] = useState('');
-    const [imageRotation, setImageRotation] = useState(0); // 0, 90, 180, 270 degrees
+    const [imageRotation, setImageRotation] = useState(0);
+    const [imageScale, setImageScale] = useState(1);
+    const [frameRotated, setFrameRotated] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
 
     // Modal state
@@ -154,7 +156,12 @@ const ProductDetail = () => {
             color: isFridgeMagnet ? null : selectedColor,
             quantity: quantity,
             imageData: imageData,
-            imageRotation: canRotate ? imageRotation : 0
+            imageRotation: imageRotation,
+            customizationDetails: {
+                scale: imageScale,
+                frameRotated: frameRotated,
+                rotation: imageRotation
+            }
         });
 
         setAddedToCart(true);
@@ -195,23 +202,36 @@ const ProductDetail = () => {
         }
     };
 
-    // Get frame dimensions based on size - scaled for modal
     const getFrameDimensions = () => {
+        let width, height, borderWidth;
         if (selectedSize === 'mini') {
-            return { width: 160, height: 220, borderWidth: 12 };
+            width = 160; height = 220; borderWidth = 12;
+        } else {
+            width = 200; height = 280; borderWidth = 14;
         }
-        return { width: 200, height: 280, borderWidth: 14 };
+
+        if (frameRotated) {
+            return { width: height, height: width, borderWidth };
+        }
+        return { width, height, borderWidth };
     };
 
     // Get magnet dimensions based on shape and size - scaled for modal
     const getMagnetDimensions = () => {
+        let width, height, isCircle = false;
+
         if (selectedShape === 'circle') {
-            return { width: 160, height: 160, isCircle: true };
+            width = 160; height = 160; isCircle = true;
+        } else if (selectedSize === '2x3') {
+            width = 140; height = 210;
+        } else {
+            width = 180; height = 240;
         }
-        if (selectedSize === '2x3') {
-            return { width: 140, height: 210, isCircle: false };
+
+        if (frameRotated && !isCircle) {
+            return { width: height, height: width, isCircle };
         }
-        return { width: 180, height: 240, isCircle: false };
+        return { width, height, isCircle };
     };
 
     // Fridge Magnet Preview Component
@@ -228,9 +248,9 @@ const ProductDetail = () => {
 
                 {/* Fridge Background */}
                 <div
-                    className="relative rounded-xl shadow-inner flex items-center justify-center"
+                    className="relative rounded-xl shadow-inner flex items-center justify-center transition-all duration-300"
                     style={{
-                        width: Math.max(dimensions.width + 60, 240),
+                        width: Math.max(dimensions.width + 60, 260),
                         height: Math.max(dimensions.height + 60, 260),
                         background: 'linear-gradient(145deg, #e8e8e8, #d0d0d0)'
                     }}
@@ -243,7 +263,7 @@ const ProductDetail = () => {
 
                     {/* Magnet */}
                     <div
-                        className="relative shadow-lg transition-all duration-300 overflow-hidden flex items-center justify-center"
+                        className="relative shadow-lg transition-all duration-500 overflow-hidden flex items-center justify-center"
                         style={{
                             width: dimensions.width,
                             height: dimensions.height,
@@ -256,10 +276,10 @@ const ProductDetail = () => {
                             <img
                                 src={imageData}
                                 alt="Your uploaded image"
-                                className={`w-full h-full object-contain transition-transform duration-300`}
+                                className={`w-full h-full object-contain transition-all duration-300`}
                                 style={{
                                     borderRadius: dimensions.isCircle ? '50%' : '6px',
-                                    transform: `rotate(${imageRotation}deg)`
+                                    transform: `rotate(${imageRotation}deg) scale(${imageScale})`
                                 }}
                             />
                         ) : (
@@ -280,10 +300,44 @@ const ProductDetail = () => {
                     </div>
                 </div>
 
+                {/* Controls */}
+                <div className="mt-6 flex flex-col gap-4 w-full max-w-xs">
+                    <div className="bg-earth-50 rounded-xl p-4 space-y-4 border border-earth-100">
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-xs font-semibold text-earth-600 uppercase flex items-center gap-1"><ZoomIn size={14} /> Zoom</span>
+                            <div className="flex items-center gap-3 bg-white rounded-lg p-1 border border-earth-200">
+                                <button onClick={() => setImageScale(s => Math.max(0.5, s - 0.1))} className="p-1.5 hover:bg-earth-50 rounded text-earth-600 transition-colors"><Minus size={14} /></button>
+                                <span className="text-xs font-mono w-8 text-center text-earth-700">{Math.round(imageScale * 100)}%</span>
+                                <button onClick={() => setImageScale(s => Math.min(3, s + 0.1))} className="p-1.5 hover:bg-earth-50 rounded text-earth-600 transition-colors"><Plus size={14} /></button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <button onClick={() => setImageRotation(r => (r + 90) % 360)} className="py-2.5 bg-white border border-earth-200 rounded-lg text-xs font-semibold text-earth-700 uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-earth-50 transition-colors shadow-sm">
+                                <RotateCw size={14} /> Rotate Img
+                            </button>
+                            {!dimensions.isCircle ? (
+                                <button onClick={() => setFrameRotated(r => !r)} className={`py-2.5 border rounded-lg text-xs font-semibold uppercase tracking-wide flex items-center justify-center gap-2 transition-colors shadow-sm ${frameRotated ? 'bg-earth-800 text-white border-earth-800' : 'bg-white text-earth-700 border-earth-200 hover:bg-earth-50'}`}>
+                                    <Layout size={14} /> Flip Frame
+                                </button>
+                            ) : (
+                                <button onClick={() => { setImageRotation(0); setImageScale(1); }} className="py-2.5 bg-white border border-earth-200 rounded-lg text-xs font-semibold text-earth-700 uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-earth-50 transition-colors shadow-sm">
+                                    <RefreshCw size={14} /> Reset
+                                </button>
+                            )}
+                        </div>
+                        {!dimensions.isCircle && (
+                            <button onClick={() => { setImageRotation(0); setImageScale(1); setFrameRotated(false); }} className="w-full py-2 bg-transparent text-xs text-earth-400 hover:text-earth-600 transition-colors">
+                                Reset Changes
+                            </button>
+                        )}
+                    </div>
+                </div>
+
                 {/* Size Label */}
-                <div className="mt-6 px-4 py-2 bg-earth-100 rounded-full">
+                <div className="mt-4 px-4 py-2 bg-earth-100 rounded-full">
                     <span className="text-sm font-medium text-earth-700">
-                        {selectedShape === 'circle' ? 'Circle' : 'Rectangle'} • {sizeLabel}
+                        {selectedShape === 'circle' ? 'Circle' : 'Rectangle'} • {sizeLabel} {frameRotated && '(Rotated)'}
                     </span>
                 </div>
             </div>
@@ -306,7 +360,7 @@ const ProductDetail = () => {
 
                 {/* Wall Background */}
                 <div
-                    className="relative rounded-xl flex items-center justify-center"
+                    className="relative rounded-xl flex items-center justify-center transition-all duration-300"
                     style={{
                         width: width + 60,
                         height: height + 50,
@@ -325,7 +379,7 @@ const ProductDetail = () => {
 
                     {/* Frame */}
                     <div
-                        className="relative transition-all duration-300"
+                        className="relative transition-all duration-500"
                         style={{
                             padding: borderWidth,
                             backgroundColor: frameColor,
@@ -373,8 +427,8 @@ const ProductDetail = () => {
                                 <img
                                     src={imageData}
                                     alt="Your uploaded image"
-                                    className="w-full h-full object-contain bg-white transition-transform duration-300"
-                                    style={{ transform: `rotate(${imageRotation}deg)` }}
+                                    className="w-full h-full object-contain bg-white transition-all duration-300"
+                                    style={{ transform: `rotate(${imageRotation}deg) scale(${imageScale})` }}
                                 />
                             ) : (
                                 <div className="flex flex-col items-center justify-center text-earth-400 p-4 bg-earth-50 w-full h-full">
@@ -386,10 +440,36 @@ const ProductDetail = () => {
                     </div>
                 </div>
 
+                {/* Controls */}
+                <div className="mt-6 flex flex-col gap-4 w-full max-w-xs">
+                    <div className="bg-earth-50 rounded-xl p-4 space-y-4 border border-earth-100">
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-xs font-semibold text-earth-600 uppercase flex items-center gap-1"><ZoomIn size={14} /> Zoom</span>
+                            <div className="flex items-center gap-3 bg-white rounded-lg p-1 border border-earth-200">
+                                <button onClick={() => setImageScale(s => Math.max(0.5, s - 0.1))} className="p-1.5 hover:bg-earth-50 rounded text-earth-600 transition-colors"><Minus size={14} /></button>
+                                <span className="text-xs font-mono w-8 text-center text-earth-700">{Math.round(imageScale * 100)}%</span>
+                                <button onClick={() => setImageScale(s => Math.min(3, s + 0.1))} className="p-1.5 hover:bg-earth-50 rounded text-earth-600 transition-colors"><Plus size={14} /></button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <button onClick={() => setImageRotation(r => (r + 90) % 360)} className="py-2.5 bg-white border border-earth-200 rounded-lg text-xs font-semibold text-earth-700 uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-earth-50 transition-colors shadow-sm">
+                                <RotateCw size={14} /> Rotate Img
+                            </button>
+                            <button onClick={() => setFrameRotated(r => !r)} className={`py-2.5 border rounded-lg text-xs font-semibold uppercase tracking-wide flex items-center justify-center gap-2 transition-colors shadow-sm ${frameRotated ? 'bg-earth-800 text-white border-earth-800' : 'bg-white text-earth-700 border-earth-200 hover:bg-earth-50'}`}>
+                                <Layout size={14} /> Flip Frame
+                            </button>
+                        </div>
+                        <button onClick={() => { setImageRotation(0); setImageScale(1); setFrameRotated(false); }} className="w-full py-2 bg-transparent text-xs text-earth-400 hover:text-earth-600 transition-colors">
+                            Reset Changes
+                        </button>
+                    </div>
+                </div>
+
                 {/* Labels */}
                 <div className="mt-4 flex flex-wrap gap-2 justify-center">
                     <div className="px-4 py-2 bg-earth-100 rounded-full">
-                        <span className="text-sm font-medium text-earth-700">{sizeLabel}</span>
+                        <span className="text-sm font-medium text-earth-700">{sizeLabel} {frameRotated && '(Rotated)'}</span>
                     </div>
                     <div className="px-4 py-2 bg-earth-100 rounded-full flex items-center gap-2">
                         <div
@@ -626,28 +706,15 @@ const ProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Preview and Rotate Buttons - Only show when image is uploaded */}
+                        {/* Preview Button - Only show when image is uploaded */}
                         {imageData && (
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => setShowPreview(true)}
-                                    className="flex-1 py-3 bg-earth-100 text-earth-700 rounded-full font-medium uppercase tracking-wide hover:bg-earth-200 transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Eye size={18} />
-                                    Preview
-                                </button>
-                                {canRotate && (
-                                    <button
-                                        onClick={() => setImageRotation((prev) => (prev + 90) % 360)}
-                                        className="py-3 px-5 bg-terracotta-100 text-terracotta-700 rounded-full font-medium uppercase tracking-wide hover:bg-terracotta-200 transition-colors flex items-center justify-center gap-2"
-                                        title="Rotate image 90°"
-                                    >
-                                        <RotateCw size={18} />
-                                        <span className="hidden sm:inline">Rotate</span>
-                                        <span className="text-xs">({imageRotation}°)</span>
-                                    </button>
-                                )}
-                            </div>
+                            <button
+                                onClick={() => setShowPreview(true)}
+                                className="w-full py-3 bg-earth-100 text-earth-700 rounded-full font-medium uppercase tracking-wide hover:bg-earth-200 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Eye size={18} />
+                                Preview & Customize
+                            </button>
                         )}
 
                         {/* Actions */}

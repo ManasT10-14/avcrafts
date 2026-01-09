@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut, Clock, CheckCircle, Palette, Truck, PackageCheck, XCircle, RotateCw } from 'lucide-react';
+import { ArrowLeft, Package, Eye, X, MapPin, Phone, Mail, ChevronDown, LogOut, Clock, CheckCircle, Palette, Truck, PackageCheck, XCircle, RotateCw, ZoomIn, Layout } from 'lucide-react';
 import api from '../utils/api';
 
 const AdminOrders = () => {
@@ -262,21 +262,43 @@ const AdminOrders = () => {
                                 {/* Customer Uploaded Image */}
                                 {selectedOrder.image_data && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-earth-900 mb-2">Customer Uploaded Image</h4>
-                                        <div className="inline-block p-2 border border-earth-200 rounded-lg bg-white overflow-hidden">
-                                            <img
-                                                src={selectedOrder.image_data}
-                                                alt="Customer upload"
-                                                className="max-w-full max-h-64 rounded transition-transform duration-300 origin-center"
-                                                style={{ transform: `rotate(${selectedOrder.image_rotation || 0}deg)` }}
-                                            />
+                                        <h4 className="text-sm font-medium text-earth-900 mb-2">Customer Design</h4>
+                                        <div className="inline-block p-4 border border-earth-200 rounded-lg bg-earth-50 relative">
+                                            <div className="overflow-hidden bg-white shadow-sm rounded border border-earth-100 flex items-center justify-center p-2" style={{ width: 'fit-content' }}>
+                                                <img
+                                                    src={selectedOrder.image_data}
+                                                    alt="Customer upload"
+                                                    className="max-w-full max-h-64 rounded origin-center"
+                                                    style={{
+                                                        transform: `rotate(${selectedOrder.customization_details?.rotation || selectedOrder.image_rotation || 0}deg) scale(${selectedOrder.customization_details?.scale || 1})`
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {selectedOrder.customization_details?.frameRotated && (
+                                                <div className="absolute top-2 right-2 px-2 py-1 bg-terracotta-500 text-white text-[10px] uppercase font-bold rounded shadow-sm flex items-center gap-1">
+                                                    <Layout size={10} /> Frame Flipped
+                                                </div>
+                                            )}
                                         </div>
-                                        {selectedOrder.image_rotation > 0 && (
-                                            <p className="text-xs text-earth-500 mt-1">
-                                                <RotateCw size={12} className="inline mr-1" />
-                                                Rotated {selectedOrder.image_rotation}°
-                                            </p>
-                                        )}
+
+                                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-earth-600">
+                                            {(selectedOrder.customization_details?.rotation || selectedOrder.image_rotation) && (
+                                                <span className="px-2 py-1 bg-earth-100 rounded flex items-center gap-1">
+                                                    <RotateCw size={10} /> Img Rotation: {selectedOrder.customization_details?.rotation || selectedOrder.image_rotation}°
+                                                </span>
+                                            )}
+                                            {selectedOrder.customization_details?.scale && selectedOrder.customization_details.scale !== 1 && (
+                                                <span className="px-2 py-1 bg-earth-100 rounded flex items-center gap-1">
+                                                    <ZoomIn size={10} /> Zoom: {Math.round(selectedOrder.customization_details.scale * 100)}%
+                                                </span>
+                                            )}
+                                            {selectedOrder.customization_details?.frameRotated && (
+                                                <span className="px-2 py-1 bg-earth-100 rounded flex items-center gap-1">
+                                                    <Layout size={10} /> Frame Orientation: Flipped
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 
